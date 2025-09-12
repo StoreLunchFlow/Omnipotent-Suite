@@ -32,3 +32,4 @@ New-Item -ItemType Directory -Path "src\Modules" -Force
     Author = "StoreLunchFlow"
     Description = "Elite cryptocurrency management framework"
 }
+
