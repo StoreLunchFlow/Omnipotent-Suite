@@ -1,0 +1,108 @@
+﻿{
+    "total_size":  1577155442,
+    "timestamp":  "2025-09-12T10:06:55Z",
+    "directories":  2820,
+    "files":  27100,
+    "file_types":  [
+                       {
+                           "extension":  ".py",
+                           "percentage":  25.52,
+                           "count":  6917
+                       },
+                       {
+                           "extension":  ".pyc",
+                           "percentage":  19.85,
+                           "count":  5378
+                       },
+                       {
+                           "extension":  "No Extension",
+                           "percentage":  19.16,
+                           "count":  5192
+                       },
+                       {
+                           "extension":  ".vim",
+                           "percentage":  7.02,
+                           "count":  1903
+                       },
+                       {
+                           "extension":  ".html",
+                           "percentage":  3.39,
+                           "count":  920
+                       },
+                       {
+                           "extension":  ".adoc",
+                           "percentage":  3.09,
+                           "count":  837
+                       },
+                       {
+                           "extension":  ".pm",
+                           "percentage":  2.49,
+                           "count":  676
+                       },
+                       {
+                           "extension":  ".pl",
+                           "percentage":  2.08,
+                           "count":  565
+                       },
+                       {
+                           "extension":  ".txt",
+                           "percentage":  1.81,
+                           "count":  491
+                       },
+                       {
+                           "extension":  ".pyi",
+                           "percentage":  1.72,
+                           "count":  466
+                       },
+                       {
+                           "extension":  ".exe",
+                           "percentage":  1.45,
+                           "count":  394
+                       },
+                       {
+                           "extension":  ".dll",
+                           "percentage":  1.33,
+                           "count":  360
+                       },
+                       {
+                           "extension":  ".tcl",
+                           "percentage":  1.12,
+                           "count":  304
+                       },
+                       {
+                           "extension":  ".h",
+                           "percentage":  1.11,
+                           "count":  302
+                       },
+                       {
+                           "extension":  ".msg",
+                           "percentage":  1.09,
+                           "count":  295
+                       },
+                       {
+                           "extension":  ".pyd",
+                           "percentage":  0.77,
+                           "count":  210
+                       },
+                       {
+                           "extension":  ".enc",
+                           "percentage":  0.61,
+                           "count":  164
+                       },
+                       {
+                           "extension":  ".decTest",
+                           "percentage":  0.53,
+                           "count":  143
+                       },
+                       {
+                           "extension":  ".typed",
+                           "percentage":  0.31,
+                           "count":  84
+                       },
+                       {
+                           "extension":  ".LIB",
+                           "percentage":  0.3,
+                           "count":  82
+                       }
+                   ]
+}
