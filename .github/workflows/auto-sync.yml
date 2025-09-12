@@ -6,16 +6,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          
-      - name: Setup Git Identity
+      - name: Auto-Sync
         run: |
           git config --global user.name 'GitHub Actions Bot'
           git config --global user.email 'actions@users.noreply.github.com'
-          
-      - name: Auto-Sync
-        run: |
           git add --all
-          git commit -m 'chore: auto-sync repository' || exit 0
+          git commit -m 'chore: auto-sync' || exit 0
           git push
