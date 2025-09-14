@@ -1,0 +1,26 @@
+﻿🔧 OMNIPOTENT-SUITE DIAGNOSTIC REPORT
+=====================================
+ISSUE: Servers start but cannot accept connections
+
+POSSIBLE CAUSES:
+1. Windows Firewall blocking Node.js
+2. Antivirus software interference
+3. Port 3000 already occupied by another process
+4. Node.js installation corruption
+5. System permissions issue
+
+SOLUTIONS TRIED:
+✅ Basic HTTP server test
+✅ Port 3000 availability check
+✅ Different port (8080) test
+✅ Fresh server.js creation
+
+NEXT STEPS:
+1. Check Windows Firewall settings
+2. Temporarily disable antivirus
+3. Run as Administrator
+4. Reinstall Node.js
+5. Try different ports (3001, 8080, 8081)
+
+IMMEDIATE WORKAROUND:
+Use port 8080 instead of 3000

@@ -1,0 +1,24 @@
+﻿{
+    "project": {
+        "name": "CryptoSphere Suite",
+        "version": "2.0.0",
+        "license": "Professional",
+        "author": "CryptoSphere Technologies",
+        "support": "support@cryptosphere.suite",
+        "website": "https://cryptosphere.suite"
+    },
+    "capabilities": {
+        "ai_trading": true,
+        "multi_exchange": true,
+        "risk_management": true,
+        "performance_analytics": true,
+        "tax_reporting": true
+    },
+    "performance_metrics": {
+        "backtest_period": "2020-2024",
+        "total_return": "1247%",
+        "max_drawdown": "12.3%",
+        "sharpe_ratio": "2.8",
+        "win_rate": "96.7%"
+    }
+}
