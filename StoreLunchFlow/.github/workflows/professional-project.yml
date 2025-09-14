@@ -1,0 +1,29 @@
+﻿name: Professional Project Intelligence
+
+on:
+  project_v2_item:
+    types: [created, edited, moved, deleted]
+
+jobs:
+  professional-processor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      projects: write
+      issues: read
+    
+    steps:
+      - name: Capture context
+        run: |
+          echo "PROJECT_TITLE=${{ github.event.project_v2_item.project.title || 'Unknown' }}" >> $GITHUB_ENV
+          echo "ITEM_ID=${{ github.event.project_v2_item.id }}" >> $GITHUB_ENV
+          echo "ACTION_TYPE=${{ github.event.action }}" >> $GITHUB_ENV
+          
+      - name: Log activity
+        run: |
+          echo "$(date -u +'%Y-%m-%dT%H:%M:%SZ'),${{ env.PROJECT_TITLE }},${{ env.ITEM_ID }},${{ env.ACTION_TYPE }},${{ github.actor }}" >> .audit/project-activity.csv
+          git config user.name "github-actions"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .audit/project-activity.csv
+          git commit -m "AUDIT: Project activity"
+          git push
