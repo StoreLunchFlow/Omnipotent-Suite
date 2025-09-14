@@ -1,35 +1,43 @@
-﻿# ENTERPRISE LICENSE SYSTEM v1.5
-# OFFLINE-FIRST VALIDATION WITH HARDWARE BINDING
+# CryptoSphere-Suite License System Module
+# Version: 2.0 - Fixed Edition
 
 function Get-SystemHardwareId {
-    $cpu = (Get-WmiObject -Class Win32_Processor).ProcessorId
-    $bios = (Get-WmiObject -Class Win32_BIOS).SerialNumber
-    $baseId = "$cpu-$bios"
-    $hash = [System.BitConverter]::ToString(
-        [System.Security.Cryptography.SHA256]::Create().ComputeHash(
-            [System.Text.Encoding]::UTF8.GetBytes($baseId)
-        )
-    ).Replace("-","").Substring(0, 16)
-    return $hash
+    $computerInfo = Get-WmiObject -Class Win32_ComputerSystemProduct
+    return ($computerInfo.UUID -replace '-', '').Substring(0, 16)
 }
 
 function New-LicenseKey {
+    [CmdletBinding()]
     param(
+        [Parameter(Mandatory=$true)]
         [string]$CustomerId,
-        [datetime]$ExpiryDate,
-        [string]$Tier = "Standard"
+        
+        [Parameter(Mandatory=$false)]
+        [DateTime]$ExpiryDate,
+        
+        [Parameter(Mandatory=$true)]
+        [ValidateSet("Basic", "Professional", "Enterprise")]
+        [string]$Tier
     )
+
+    # Set default expiry if not provided (6 months from now)
+    if (-not $ExpiryDate) {
+        $ExpiryDate = (Get-Date).AddMonths(6)
+        Write-Host "??  Using default expiry date: $($ExpiryDate.ToString('yyyy-MM-dd'))" -ForegroundColor Yellow
+    }
+
+    # Create license payload
+    $payload = "$CustomerId|$($ExpiryDate.ToString('yyyy-MM-dd'))|$Tier|$(Get-SystemHardwareId)"
     
-    $hardwareId = Get-SystemHardwareId
-    $payload = "$CustomerId|$($ExpiryDate.ToString('yyyy-MM-dd'))|$Tier|$hardwareId"
-    $encrypted = ConvertTo-SecureString -String $payload -AsPlainText -Force
-    $licenseKey = [System.Convert]::ToBase64String(
-        [System.Text.Encoding]::UTF8.GetBytes(
-            [System.Runtime.InteropServices.Marshal]::PtrToStringAuto(
-                [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($encrypted)
-            )
-        )
-    )
+    # Generate secure hash
+    $hash = New-Object System.Security.Cryptography.SHA256Managed
+    $signature = [System.BitConverter]::ToString($hash.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($payload))) -replace '-'
+    
+    # Combine payload and signature
+    $licenseData = "$payload|$signature"
+    
+    # Return as Base64 encoded license key
+    $licenseKey = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($licenseData))
     
     return @{
         LicenseKey = $licenseKey
@@ -40,65 +48,45 @@ function New-LicenseKey {
 }
 
 function Test-LicenseKey {
+    [CmdletBinding()]
     param(
+        [Parameter(Mandatory=$true)]
         [string]$LicenseKey
     )
     
     try {
-        $decoded = [System.Text.Encoding]::UTF8.GetString(
-            [System.Convert]::FromBase64String($LicenseKey)
-        )
+        # Decode from Base64
+        $decodedData = [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($LicenseKey))
+        $parts = $decodedData -split '\|'
         
-        $secureString = ConvertTo-SecureString -String $decoded -AsPlainText -Force
-        $plainText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto(
-            [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureString)
-        )
-        
-        $parts = $plainText -split "\|"
-        if($parts.Length -ne 4) { return $false }
-        
-        $currentHardwareId = Get-SystemHardwareId
-        if($parts[3] -ne $currentHardwareId) {
-            Write-Host "License hardware binding mismatch." -ForegroundColor Red
-            return $false
+        if ($parts.Count -ne 5) {
+            return @{ Valid = $false; Reason = "Invalid license format" }
         }
         
-        $expiryDate = [datetime]::ParseExact($parts[1], "yyyy-MM-dd", $null)
-        if((Get-Date) -gt $expiryDate) {
-            Write-Host "License has expired." -ForegroundColor Red
-            return $false
-        }
+        $customerId = $parts[0]
+        $expiryDate = [DateTime]::ParseExact($parts[1], 'yyyy-MM-dd', $null)
+        $tier = $parts[2]
+        $hardwareId = $parts[3]
+        $signature = $parts[4]
+        
+        # Recreate payload for validation
+        $validationPayload = "$customerId|$($expiryDate.ToString('yyyy-MM-dd'))|$tier|$hardwareId"
+        $hash = New-Object System.Security.Cryptography.SHA256Managed
+        $expectedSignature = [System.BitConverter]::ToString($hash.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($validationPayload))) -replace '-'
+        
+        $isValid = ($signature -eq $expectedSignature) -and (Get-SystemHardwareId -eq $hardwareId) -and ($expiryDate -gt (Get-Date))
         
         return @{
-            Valid = $true
-            CustomerId = $parts[0]
+            Valid = $isValid
+            CustomerId = $customerId
             ExpiryDate = $expiryDate
-            Tier = $parts[2]
+            Tier = $tier
+            Reason = if (-not $isValid) { "License validation failed" } else { "Valid" }
         }
     }
     catch {
-        return @{Valid = $false}
+        return @{ Valid = $false; Reason = "Corrupted license data: $($_.Exception.Message)" }
     }
 }
 
-function Install-License {
-    param(
-        [string]$LicenseKey,
-        [string]$Path = "$env:ProgramData\CryptoSphereSuite\license.key"
-    )
-    
-    $validation = Test-LicenseKey -LicenseKey $LicenseKey
-    if(-not $validation.Valid) {
-        throw "Invalid license key. Installation failed."
-    }
-    
-    $licenseDir = Split-Path -Path $Path -Parent
-    if(-not (Test-Path $licenseDir)) {
-        New-Item -ItemType Directory -Path $licenseDir -Force | Out-Null
-    }
-    
-    $LicenseKey | Out-File -FilePath $Path -Encoding UTF8
-    Write-Host "License installed successfully. Tier: $($validation.Tier)" -ForegroundColor Green
-}
-
-Export-ModuleMember -Function *
+Export-ModuleMember -Function New-LicenseKey, Test-LicenseKey, Get-SystemHardwareId
