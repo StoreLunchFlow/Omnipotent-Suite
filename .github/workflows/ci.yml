@@ -1,24 +1,19 @@
-﻿name: CI Validation
+name: CI
 
-on:
-  pull_request:
-    branches: [ main ]
-  push:
-    branches: [ main ]
+on: [push, pull_request]
 
 jobs:
-  validate:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        cache: 'npm'
-    - name: Install dependencies
-      run: npm ci
-    - name: Run tests
-      run: npm test
-    - name: Build verification
-      run: npm run build --if-present
+      - uses: actions/checkout@v4
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -Force
+          Invoke-ScriptAnalyzer .\ -Recurse -Severity Warning
+      - name: Run Pester tests
+        shell: pwsh
+        run: |
+          Install-Module Pester -Force -SkipPublisherCheck
+          Invoke-Pester -Output Detailed

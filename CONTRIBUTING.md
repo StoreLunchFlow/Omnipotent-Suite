@@ -1,8 +1,13 @@
-﻿# Contributing to StoreLunchFlow
-We welcome contributions! Please follow these steps:
-1. Fork this repository.
-2. Create a feature branch: git checkout -b feat/amazing-feature
-3. Commit your changes: git commit -m 'Add amazing feature'
-4. Push to the branch: git push origin feat/amazing-feature
-5. Open a Pull Request.
-Please ensure your code adheres to our standards and includes tests where applicable.
+# Contributing to Omnipotent-Suite
+
+We love your input! We want to make contributing as easy and transparent as possible.
+
+## Development process
+1. Fork the repo and create your branch from main.
+2. If you've added code, add tests.
+3. Ensure the test suite passes.
+4. Make sure your code lints (PSScriptAnalyzer).
+5. Issue that pull request!
+
+## License
+By contributing, you agree that your contributions will be licensed under the MIT License.

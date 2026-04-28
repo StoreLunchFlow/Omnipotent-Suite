@@ -1,0 +1,18 @@
+# PowerShell
+*.ps1xml
+*.psd1
+*.psm1
+*.log
+*.bak
+*.tmp
+*.pfx
+*.p12
+secret*.txt
+*.key
+*.enc
+# Build outputs
+bin/
+obj/
+*.exe
+*.dll
+*.bin
